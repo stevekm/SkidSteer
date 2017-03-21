@@ -2,7 +2,8 @@
 # python 2.7
 
 
-#
+import sys
+import os
 
 def my_debugger(vars):
     # starts interactive Python terminal at location in script
@@ -15,7 +16,7 @@ def my_debugger(vars):
     shell = code.InteractiveConsole(vars)
     shell.interact()
 
-def load_tabular(path, sep='\t', header=0, na_values=['.'], *args, **kwargs):
+def load_tabular(path, *args, **kwargs):
     # load a tabular file into a dataframe with pandas
     import pandas as pd
     df = pd.read_table(path, *args, **kwargs)
@@ -34,7 +35,7 @@ class queryTable(experimentFile):
         experimentFile.__init__(self, filetype = "query_table", path = path)
         self.path = path
     def load(self):
-        x = load_tabular(self.path)
+        x = load_tabular(self.path, sep='\t', header=0, na_values=['.'])
         return x
 
 class sampleSheet(experimentFile):
@@ -52,8 +53,8 @@ class experimentSample:
         self.name = name
         self.files = {}
     def addFile(self, x):
-        if isinstance(x, experimentFile): self.files[x.path] = x
-        if not isinstance(x, experimentFile): self.files[x] = experimentFile('unspecified', x)
+        if isinstance(x, experimentFile): self.files[x.path] = os.path.abspath(x.path)
+        if not isinstance(x, experimentFile): self.files[x] = experimentFile('unspecified', os.path.abspath(x))
         # self.files.append(x)
 
 class experiment:
@@ -63,6 +64,7 @@ class experiment:
         self.samples = {}
         self.samplesheet = sampleSheet(samplesheet).load()
         self.files = []
+        self.dir = os.path.dirname(samplesheet)
     def addSample(self, sample):
         if isinstance(sample, experimentSample): self.samples[sample.name] = sample
         if not isinstance(sample, experimentSample): self.samples[sample] = experimentSample(sample)
@@ -70,17 +72,33 @@ class experiment:
         for key in self.samples.keys():
             print key
 
+def parse_sample_dir(mypath):
+    # get the samples from a dir; one sample per subdir in the parent dir
+    # my_debugger(locals().copy())
+    samples_list = []
+    dir_list = [d for d in os.listdir(mypath) if os.path.isdir(os.path.join(mypath, d))]
+    # experimentSample(f)
+    for d in dir_list:
+        mydirpath = os.path.join(mypath,d)
+        file_list = [f for f in os.listdir(mydirpath) if os.path.isfile(os.path.join(mydirpath, f))]
+        mysample = experimentSample(d)
+        for f in file_list: mysample.addFile(f)
+        samples_list.append(mysample)
+    return samples_list
+
 
 
 x = queryTable("16-05/IonXpress_003/IonXpress_003_query.tsv")
 
 s = experimentSample("16")
+
 s.addFile(x)
 
-a = experiment("MyWonderfulExperiment", "16-05/sample_barcode_IDs.tsv")
+a = experiment(name = "MyWonderfulExperiment", samplesheet = "16-05/sample_barcode_IDs.tsv")
 a.addSample(s)
 a.addSample("foo")
 
+my_debugger(globals().copy())
 a.samples['16'].files['16-05/IonXpress_003/IonXpress_003_query.tsv'].load()
-
+parse_sample_dir('16-05')
 my_debugger(globals().copy())
