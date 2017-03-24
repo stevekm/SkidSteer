@@ -162,10 +162,22 @@ class doPythonCode(PythonTask):
     def build_command(self):
         print("This is some Python code")
 
+# class convertFile(PythonTask):
+#     '''
+#     Write lines from input file to output file in a reversed order
+#     '''
+#     def __init__(self):
+#         PythonTask.__init__(self, 'convert-file')
+#     def build_command(self):
+#         for file in self.input_file:
+#             with open(file) as input_file, open('newtest', 'w') as new:
+#                 for line in old:
+#                     if line.rsplit('|', 1)[-1].strip() == 'number3':
+#                         new.write('this is replacement|number7\n')
+#                     else:
+#                         new.write(line)
 
-
-
-def get_sample_files(sampleID, dir, suffix):
+def get_sample_files(sample_ID, dir, suffix):
     '''
     Find files for a given sample in the supplied directory
     '''
@@ -180,6 +192,20 @@ def run_pipeline(task_list):
     for task in task_list:
         task.run()
         time.sleep(3) # delays for 3 seconds
+
+def transform_file(input_dir, input_suffix, output_suffix, sample_ID):
+    '''
+    Return the output file for a given sample input file
+    '''
+    import glob
+    import os
+    # get the input files
+    glob_pattern = os.path.join(input_dir, input_suffix)
+    input_file_list = []
+    for item in glob.glob(glob_pattern):
+        input_file_list.append(item)
+    
+
 
 # create task objects
 foo = printFoo()
