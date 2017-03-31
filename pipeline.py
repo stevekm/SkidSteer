@@ -20,10 +20,10 @@ transform_file_suffix(myfile, ".txt", ".foo")
 sample_ID = "test2"
 file_suffix = ".fastq"
 
+print(build_io_files_list(input_dir = "input", input_suffix = ".fastq", output_dir = "output", output_suffix = ".txt", sample_ID = sample_ID))
 
-print(find_sample_files(dir = "input", sample_ID = sample_ID, file_suffix = file_suffix))
-
-my_debugger(globals().copy())
+sys.exit()
+# my_debugger(globals().copy())
 
 # create task objects
 foo = printFoo()

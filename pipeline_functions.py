@@ -81,3 +81,16 @@ def transform_file(input_dir, input_suffix, output_suffix, sample_ID):
     input_file_list = []
     for item in glob.glob(glob_pattern):
         input_file_list.append(item)
+
+def build_io_files_list(input_dir, input_suffix, output_dir, output_suffix, sample_ID):
+    '''
+    Return a list of the output files to be created for a given set of input criteria
+    '''
+    # get input files from input dir
+    input_files = find_sample_files(dir = input_dir, sample_ID = sample_ID, file_suffix = input_suffix)
+    # get output file paths
+    output_files = []
+    for file in input_files:
+        output_files.append(transform_file_suffix(input_file = file, input_suffix = input_suffix, output_suffix = output_suffix))
+    io_dict = {"input": input_files, "output": output_files}
+    return(io_dict)
