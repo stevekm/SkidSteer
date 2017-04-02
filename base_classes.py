@@ -1,38 +1,54 @@
 #!/usr/bin/env python
 
-class ShellTask():
+from pipeline_functions import *
+
+class PipelineTask():
+    '''
+    A base class for all pipeline tasks.
+    This holds attributes and methods that all pipeline tasks share
+    '''
+    def __init__(self, name, sampleID = None, input_dir = None, input_suffix = None, input_files = None):
+        import sys
+        import os
+        self.name = name
+        self.sampleID = sampleID
+        self.input_files = input_files
+        self.input_dir = input_dir
+        self.input_suffix = input_suffix
+        self.output_dir_base = 'output'
+        self.output_dir = os.path.join(self.output_dir_base, self.name)
+    def set_input_from_task(self, task, suffix):
+        '''
+        Set the input dir files from another task's output dir
+        '''
+        self.input_dir = task.output_dir
+        self.input_suffix = suffix
+        print('')
+    def set_inputs(self, input_dir, suffix):
+        '''
+        Set the Input files and input dir for the object
+        '''
+        self.input_dir = input_dir
+        self.input_suffix = suffix
+        print('')
+
+
+class ShellTask(PipelineTask):
     '''
     A base class for pipeline tasks that will be run in the system shell
     '''
-    def __init__(self, name, sampleID = None):
+    def __init__(self, name):
         '''
         Initialize the object with default attributes
         These can be overwritten in your Task subclasses
         '''
-        import sys
-        import os
-        self.sampleID = sampleID
+        PipelineTask.__init__(self, name)
         # attributes that build the system command
         self.environment = ''
         self.hpc_params = ''
         self.pre_processing = ''
         self.sys_command = ''
         self.post_processing = ''
-        # base location & settings
-        self.task_name = name
-        self.input_files = None
-        self.input_dir = None
-        self.input_suffix = None
-        self.inputs = (None, None) # ("dir", ".suffix")
-        self.input_from_task = None
-        self.output_dir_base = 'output'
-        self.output_dir = os.path.join(self.output_dir_base,self.task_name)
-    def set_inputs(self):
-        '''
-        Set the Input files and input dir for the object
-        '''
-        # do a thing
-
     def build_command(self):
         '''
         Default method to build the system command to be passed to the shell
@@ -59,40 +75,34 @@ class ShellTask():
         command = self.build_command()
         if command != False:
             print("--------------------")
-            print("Now running task: {}".format(self.task_name))
+            print("Now running task: {}".format(self.name))
             print("Command is:\n{}".format(self))
             subprocess_cmd(command)
     def __repr__(self):
         return self.build_command()
 
-class PythonTask():
+class PythonTask(PipelineTask):
     '''
     A base class for tasks which will be run using custom internal Python code
     '''
-    def __init__(self, name, sampleID = None):
+    def __init__(self, name):
         '''
         Initialize the object with default attributes
         These can be overwritten in your Task subclasses
         '''
-        import sys
-        import os
-        self.task_name = name
-        self.input_files = None
-        self.input_from_task = None
-        self.output_dir_base = 'output'
-        self.output_dir = os.path.join(self.output_dir_base,self.task_name)
+        PipelineTask.__init__(self, name)
     def build_command(self):
         '''
         Default method to setup the Python code to execute
         This can be overwritten in your Task subclasses
         '''
-        print("No commands have been set for task {}".format(self.task_name))
+        print("No commands have been set for task {}".format(self.name))
     def run(self):
         '''
         Run the custom Python code that has been set
         '''
         print("--------------------")
-        print("Now running task: {}".format(self.task_name))
+        print("Now running task: {}".format(self.name))
         self.build_command()
     def __repr__(self):
-        return self.task_name
+        return self.name

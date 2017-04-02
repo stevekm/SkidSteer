@@ -41,23 +41,31 @@ def mkdirs(path, return_path=False):
         return path
 
 
-def find_sample_files(dir, sample_ID, file_suffix):
+def find_sample_files(dir, sampleID, file_suffix):
     import os
     file_list = []
     for file in os.listdir("input"):
         if file.endswith(file_suffix):
-            if file.startswith(sample_ID):
+            if file.startswith(sampleID):
                 file_list.append(os.path.join(dir, file))
     return(file_list)
 
-def run_pipeline(task_list):
+
+def run_pipeline(task_list, sampleID):
     '''
     Run all tasks supplied to the pipeline
     '''
     import time
     for task in task_list:
+        # my_debugger(locals().copy())
+        task.sampleID = sampleID
+        if task.input_dir != None:
+            task.input_files = find_sample_files(task.input_dir, task.sampleID, task.input_suffix)
+        if task.output_dir != None:
+            mkdirs(task.output_dir)
         task.run()
         time.sleep(3) # delays for 3 seconds
+
 
 def transform_file_suffix(input_file, input_suffix, output_suffix):
     '''
@@ -69,7 +77,7 @@ def transform_file_suffix(input_file, input_suffix, output_suffix):
         output_filename = filename + output_suffix
         return(output_filename)
 
-def transform_file(input_dir, input_suffix, output_suffix, sample_ID):
+def transform_file(input_dir, input_suffix, output_suffix, sampleID):
     '''
     Return the output file for a given sample input file
     using glob
@@ -82,12 +90,12 @@ def transform_file(input_dir, input_suffix, output_suffix, sample_ID):
     for item in glob.glob(glob_pattern):
         input_file_list.append(item)
 
-def build_io_files_list(input_dir, input_suffix, output_dir, output_suffix, sample_ID):
+def build_io_files_list(input_dir, input_suffix, output_dir, output_suffix, sampleID):
     '''
     Return a list of the output files to be created for a given set of input criteria
     '''
     # get input files from input dir
-    input_files = find_sample_files(dir = input_dir, sample_ID = sample_ID, file_suffix = input_suffix)
+    input_files = find_sample_files(dir = input_dir, sampleID = sampleID, file_suffix = input_suffix)
     # get output file paths
     output_files = []
     for file in input_files:

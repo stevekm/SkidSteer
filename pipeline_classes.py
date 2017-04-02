@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from base_classes import *
+from pipeline_functions import *
 
 class printFoo(ShellTask):
     '''
@@ -22,6 +23,8 @@ class convertFastq2Txt(ShellTask):
         '''
         Do the conversion
         '''
+        command = 'echo "In this step I am going to convert a file"'
+        return(command)
 
 
 class runFastQC(ShellTask):
@@ -30,14 +33,16 @@ class runFastQC(ShellTask):
     '''
     def __init__(self):
         ShellTask.__init__(self, 'fastqc')
+        # super(runFastQC, self).__init__(**kwargs)
         self.environment = 'module load fastqc/0.11.4'
         self.sys_command ='fastqc'
         self.threads = 4
         self.params = '--nogroup'
+        self.input_suffix = ".fastq"
     def build_command(self):
         '''
         Method for building the FastQC command
-        ex: fastqc --threads "$THREADS" --nogroup --outdir "$tmpFastQCdir1" "$INPUTFILE"
+        ex: fastqc --threads "$THREADS" --nogroup --outdir /path/to/output file.fastq.gz
         '''
         command = '{}\n{}'.format(
         self.environment,
