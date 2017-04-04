@@ -2,28 +2,33 @@
 
 from pipeline_functions import *
 
-class PipelineTask():
+class PipelineTask(object):
     '''
     A base class for all pipeline tasks.
     This holds attributes and methods that all pipeline tasks share
     '''
-    def __init__(self, name, sampleID = None, input_dir = None, input_suffix = None, input_files = None):
+    def __init__(self, name, sampleID = None, input_task = None, input_dir = None, input_suffix = None, input_files = None, *args, **kwargs):
         import sys
         import os
         self.name = name
         self.sampleID = sampleID
         self.input_files = input_files
-        self.input_dir = input_dir
-        self.input_suffix = input_suffix
+        if input_task != None:
+            self.set_input_from_task(input_task, input_suffix)
+        else:
+            self.input_dir = input_dir
+            self.input_suffix = input_suffix
         self.output_dir_base = 'output'
         self.output_dir = os.path.join(self.output_dir_base, self.name)
     def set_input_from_task(self, task, suffix):
         '''
         Set the input dir files from another task's output dir
         '''
-        self.input_dir = task.output_dir
-        self.input_suffix = suffix
-        print('')
+        if issubclass(type(task), PipelineTask):
+            self.input_dir = task.output_dir
+            self.input_suffix = suffix
+        else:
+            print('ERROR: Task is not a sublcass of type PipelineTask')
     def set_inputs(self, input_dir, suffix):
         '''
         Set the Input files and input dir for the object
@@ -37,12 +42,12 @@ class ShellTask(PipelineTask):
     '''
     A base class for pipeline tasks that will be run in the system shell
     '''
-    def __init__(self, name):
+    def __init__(self, name, *args, **kwargs):
         '''
         Initialize the object with default attributes
         These can be overwritten in your Task subclasses
         '''
-        PipelineTask.__init__(self, name)
+        PipelineTask.__init__(self, name, *args, **kwargs)
         # attributes that build the system command
         self.environment = ''
         self.hpc_params = ''
@@ -85,12 +90,12 @@ class PythonTask(PipelineTask):
     '''
     A base class for tasks which will be run using custom internal Python code
     '''
-    def __init__(self, name):
+    def __init__(self, name, *args, **kwargs):
         '''
         Initialize the object with default attributes
         These can be overwritten in your Task subclasses
         '''
-        PipelineTask.__init__(self, name)
+        PipelineTask.__init__(self, name, *args, **kwargs)
     def build_command(self):
         '''
         Default method to setup the Python code to execute
