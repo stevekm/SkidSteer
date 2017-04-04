@@ -102,3 +102,11 @@ def build_io_files_list(input_dir, input_suffix, output_dir, output_suffix, samp
         output_files.append(transform_file_suffix(input_file = file, input_suffix = input_suffix, output_suffix = output_suffix))
     io_dict = {"input": input_files, "output": output_files}
     return(io_dict)
+
+def set_input_from_task(self, task, suffix):
+    '''
+    Set the input dir files from another task's output dir
+    '''
+    self.input_dir = task.output_dir
+    self.input_suffix = suffix
+    print('')
