@@ -57,10 +57,7 @@ def run_pipeline(task_list, sampleID):
     '''
     import time
     for task in task_list:
-        # my_debugger(locals().copy())
-        task.sampleID = sampleID
-        if task.input_dir != None:
-            task.input_files = find_sample_files(task.input_dir, task.sampleID, task.input_suffix)
+        # make the outdir if present
         if task.output_dir != None:
             mkdirs(task.output_dir)
         task.run()
@@ -77,20 +74,20 @@ def transform_file_suffix(input_file, input_suffix, output_suffix):
         output_filename = filename + output_suffix
         return(output_filename)
 
-def transform_file(input_dir, input_suffix, output_suffix, sampleID):
-    '''
-    Return the output file for a given sample input file
-    using glob
-    '''
-    import glob
-    import os
-    # get the input files
-    glob_pattern = os.path.join(input_dir, input_suffix)
-    input_file_list = []
-    for item in glob.glob(glob_pattern):
-        input_file_list.append(item)
+# def transform_file(input_dir, input_suffix, output_suffix, sampleID):
+#     '''
+#     Return the output file for a given sample input file
+#     using glob
+#     '''
+#     import glob
+#     import os
+#     # get the input files
+#     glob_pattern = os.path.join(input_dir, input_suffix)
+#     input_file_list = []
+#     for item in glob.glob(glob_pattern):
+#         input_file_list.append(item)
 
-def build_io_files_list(input_dir, input_suffix, output_dir, output_suffix, sampleID):
+def build_io_files(input_dir, input_suffix, output_dir, output_suffix, sampleID):
     '''
     Return a list of the output files to be created for a given set of input criteria
     '''
