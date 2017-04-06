@@ -1,25 +1,27 @@
 #!/usr/bin/env python
 
 from pipeline_functions import *
+import sys
+import os
 
 class PipelineTask(object):
     '''
     A base class for all pipeline tasks.
     This holds attributes and methods that all pipeline tasks share
     '''
-    def __init__(self, name, sampleID = None, input_task = None, input_dir = None, input_suffix = None, input_files = None, *args, **kwargs):
-        import sys
-        import os
+    def __init__(self, name, sampleID = None, input_task = None, input_dir = None, input_suffix = None, output_suffix = None, *args, **kwargs):
         self.name = name
         self.sampleID = sampleID
-        self.input_files = input_files
-        if input_task != None:
-            self.set_input_from_task(input_task, input_suffix)
-        else:
-            self.input_dir = input_dir
-            self.input_suffix = input_suffix
+        # Set input files and dirs
+        if input_suffix != None: # no input suffix = no input files
+            if input_task != None:
+                self.set_input_from_task(input_task, input_suffix)
+            else:
+                self.set_inputs(input_dir, input_suffix)
+        # set output files and dirs
         self.output_dir_base = 'output'
         self.output_dir = os.path.join(self.output_dir_base, self.name)
+        self.output_suffix = output_suffix
     def set_input_from_task(self, task, suffix):
         '''
         Set the input dir files from another task's output dir
@@ -35,7 +37,11 @@ class PipelineTask(object):
         '''
         self.input_dir = input_dir
         self.input_suffix = suffix
-        print('')
+        # my_debugger(locals().copy())
+        if self.input_dir != None:
+            self.input_files = find_sample_files(self.input_dir, self.sampleID, self.input_suffix)
+        else:
+            self.input_files = []
 
 
 class ShellTask(PipelineTask):
