@@ -65,7 +65,6 @@ class alignBowtie2(ShellTask):
         Method for building the bowtie2 command
         ex: bowtie2 --threads "$THREADS" --local -x "$tmpGenome" -q -U "$INPUTFILE" | samtools view -@ "$THREADS" -Sb1 - | samtools sort -m 10G -@ "$THREADS" - "$OUTFILE"
         '''
-        # my_debugger(globals().copy())
         # set the base command and params
         command = '{}'.format(self.sys_command)
         command = '{} {}'.format(command, self.params)

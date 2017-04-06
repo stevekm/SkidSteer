@@ -91,6 +91,7 @@ def build_io_files(input_dir, input_suffix, output_dir, output_suffix, sampleID)
     '''
     Return a list of the output files to be created for a given set of input criteria
     '''
+    # print(build_io_files(input_dir = "input", input_suffix = ".fastq", output_dir = "output", output_suffix = ".txt", sampleID = sampleID))
     # get input files from input dir
     input_files = find_sample_files(dir = input_dir, sampleID = sampleID, file_suffix = input_suffix)
     # get output file paths
