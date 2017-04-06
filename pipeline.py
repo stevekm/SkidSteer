@@ -11,9 +11,8 @@ from pipeline_classes import *
 from pipeline_functions import *
 
 if __name__ == "__main__":
-    # ~~~~~~ CREATE TASK OBKECTS ~~~~~ #
     sampleID = "test2"
-    print(build_io_files(input_dir = "input", input_suffix = ".fastq", output_dir = "output", output_suffix = ".txt", sampleID = sampleID))
+    # print(build_io_files(input_dir = "input", input_suffix = ".fastq", output_dir = "output", output_suffix = ".txt", sampleID = sampleID))
     # ~~~~~~ CREATE TASK OBJECTS ~~~~~ #
     foo = printFoo(sampleID = sampleID)
 
