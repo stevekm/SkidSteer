@@ -85,8 +85,7 @@ class ShellTask(PipelineTask):
         '''
         command = self.build_command()
         if command != False:
-            print("--------------------")
-            print("Now running task: {}".format(self.name))
+            print_divider("Now running task: {}".format(self.name))
             print("Command is:\n{}".format(self))
             subprocess_cmd(command)
     def __repr__(self):
@@ -112,8 +111,7 @@ class PythonTask(PipelineTask):
         '''
         Run the custom Python code that has been set
         '''
-        print("--------------------")
-        print("Now running task: {}".format(self.name))
+        print_divider("Now running task: {}".format(self.name))
         self.build_command()
     def __repr__(self):
         return self.name

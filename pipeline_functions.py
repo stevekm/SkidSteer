@@ -12,8 +12,12 @@ def subprocess_cmd(command):
 def my_debugger(vars):
     '''
     Starts interactive Python terminal at location in script
-    call with my_debugger(globals().copy()) anywhere in your script
-    or call my_debugger(locals().copy()) from anywhere within this package
+    call with
+    my_debugger(globals().copy())
+    anywhere in your script
+    or call
+    my_debugger(locals().copy())
+    from anywhere within this package
     '''
     import readline # optional, will allow Up/Down/History in the console
     import code
@@ -50,19 +54,25 @@ def find_sample_files(dir, sampleID, file_suffix):
                 file_list.append(os.path.join(dir, file))
     return(file_list)
 
+def print_divider(string):
+    '''
+    Add a divider to the message to print_divider
+    '''
+    message = "--------------------\n{}\n".format(string)
+    print(message)
 
 def run_pipeline(task_list, sampleID):
     '''
     Run all tasks supplied to the pipeline
     '''
     import time
+    print_divider("Running Pipeline\n\nSample ID is: {}\n".format(sampleID))
     for task in task_list:
         # make the outdir if present
         if task.output_dir != None:
             mkdirs(task.output_dir)
         task.run()
         time.sleep(3) # delays for 3 seconds
-
 
 def transform_file_suffix(input_file, input_suffix, output_suffix):
     '''
@@ -73,6 +83,21 @@ def transform_file_suffix(input_file, input_suffix, output_suffix):
         filename, file_extension = os.path.splitext(input_file)
         output_filename = filename + output_suffix
         return(output_filename)
+
+def make_output_path(input_file, output_dir):
+    '''
+    Chage the parent dir of the input file to the output_dir
+    '''
+    import os
+    return(os.path.join(output_dir, os.path.basename(input_file)))
+
+def transform_file(input_file, input_suffix, output_dir, output_suffix):
+    '''
+    Convert and input file path into an output file path
+    '''
+    output_file = make_output_path(input_file, output_dir)
+    output_file = transform_file_suffix(output_file, input_suffix, output_suffix)
+    return(output_file)
 
 # def transform_file(input_dir, input_suffix, output_suffix, sampleID):
 #     '''
@@ -101,10 +126,10 @@ def build_io_files(input_dir, input_suffix, output_dir, output_suffix, sampleID)
     io_dict = {"input": input_files, "output": output_files}
     return(io_dict)
 
-def set_input_from_task(self, task, suffix):
-    '''
-    Set the input dir files from another task's output dir
-    '''
-    self.input_dir = task.output_dir
-    self.input_suffix = suffix
-    print('')
+# def set_input_from_task(self, task, suffix):
+#     '''
+#     Set the input dir files from another task's output dir
+#     '''
+#     self.input_dir = task.output_dir
+#     self.input_suffix = suffix
+#     print('')

@@ -71,7 +71,7 @@ class alignBowtie2(ShellTask):
         # list to hold command for each input file
         command_list = []
         for input_fastq in self.input_files:
-            output_bam = transform_file_suffix(input_fastq, self.input_suffix, self.output_suffix)
+            output_bam = transform_file(input_file = input_fastq, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
             file_command = '{} -q -U {} --threads {} | samtools view -@ "{}" -Sb1 - | samtools sort -m {} -@ "{}" - -o  "{}"\nsamtools index "{}"'.format(command, input_fastq, self.threads, self.threads, self.mem, self.threads, output_bam, output_bam)
             command_list.append(file_command)
         # make a single command string for all the input files
@@ -103,3 +103,27 @@ class convertFile(PythonTask):
                         new.write('this is replacement|number7\n')
                     else:
                         new.write(line)
+
+class bamToBed(ShellTask):
+    '''
+    Convert a .bam file to .bed format with bedtools
+    '''
+    def __init__(self, *args, **kwargs):
+        ShellTask.__init__(self, 'bamToBed', input_suffix = ".bam", output_suffix = ".bed", *args, **kwargs)
+        self.sys_command ='bamToBed'
+    def build_command(self):
+        '''
+        Method for building the bamToBed command
+        ex: bamToBed -i test.bam > test.bed
+        '''
+        # set the base command and params
+        command = '{}'.format(self.sys_command)
+        # list to hold command for each input file
+        command_list = []
+        for input_bam in self.input_files:
+            output_bam = transform_file(input_file = input_bam, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
+            file_command = '{} -i {} > {}'.format(command, input_bam, output_bam)
+            command_list.append(file_command)
+        # make a single command string for all the input files
+        command = '\n'.join(command_list)
+        return(command)
