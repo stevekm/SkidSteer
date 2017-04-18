@@ -57,7 +57,7 @@ The following aspects were actively avoided in the creation of `SkidSteer`:
 
 # Example Output
 
-The following output can been seen by running the provided example (pipeline)[https://github.com/stevekm/SkidSteer/blob/4c8a9100e89f48b77e866a13865f82c206ce5523/pipeline.py]
+The following output can been seen by running the provided example [pipeline](https://github.com/stevekm/SkidSteer/blob/4c8a9100e89f48b77e866a13865f82c206ce5523/pipeline.py)
 
 ```
 $ ./pipeline.py
