@@ -166,3 +166,6 @@ output
 |-- python-task
 `-- txt2fastq
 ```
+
+# Why `SkidSteer`?
+Because the best pipeline is one you built yourself.
