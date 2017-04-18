@@ -142,3 +142,27 @@ Command is:
 echo "In this step I am going to convert a file"
 In this step I am going to convert a file
 ```
+
+Output can be seen here:
+
+```
+$ tree output
+output
+|-- bamToBed
+|   `-- test2.bed
+|-- bamToBedgraph
+|   `-- test2.bedgraph
+|-- bedToBigBed
+|   `-- test2.bigbed
+|-- bedgraphToBigWig
+|   `-- test2.bw
+|-- bowtie2
+|   |-- test2.bam
+|   `-- test2.bam.bai
+|-- fastqc
+|   |-- test2_fastqc.html
+|   `-- test2_fastqc.zip
+|-- printfoo
+|-- python-task
+`-- txt2fastq
+```
