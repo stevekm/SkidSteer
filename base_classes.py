@@ -9,19 +9,16 @@ class PipelineTask(object):
     A base class for all pipeline tasks.
     This holds attributes and methods that all pipeline tasks share
     '''
-    def __init__(self, name, sampleID = None, input_task = None, input_dir = None, input_suffix = None, output_suffix = None, *args, **kwargs):
+    def __init__(self, name, sampleID = None, input_task = None, input_dir = None, input_suffix = None, output_suffix = None, *args, **kwargs): #
         self.name = name
         self.sampleID = sampleID
-        # Set input files and dirs
-        if input_suffix != None: # no input suffix = no input files
-            if input_task != None:
-                self.set_input_from_task(input_task, input_suffix)
-            else:
-                self.set_inputs(input_dir, input_suffix)
-        # set output files and dirs
+        # set files and dirs
         self.output_dir_base = 'output'
-        self.output_dir = os.path.join(self.output_dir_base, self.name)
+        self.output_dir = mkdirs(os.path.join(self.output_dir_base, self.name), return_path=True)
         self.output_suffix = output_suffix
+        self.input_task = input_task
+        self.input_dir = input_dir
+        self.input_suffix = input_suffix
     def set_input_from_task(self, task, suffix):
         '''
         Set the input dir files from another task's output dir
@@ -38,10 +35,11 @@ class PipelineTask(object):
         self.input_dir = input_dir
         self.input_suffix = suffix
         # my_debugger(locals().copy())
-        if self.input_dir != None:
-            self.input_files = find_sample_files(self.input_dir, self.sampleID, self.input_suffix)
-        else:
-            self.input_files = []
+        if suffix != None:
+            if input_dir != None:
+                self.input_files = find_sample_files(self.input_dir, self.sampleID, self.input_suffix)
+            else:
+                self.input_files = []
 
 
 class ShellTask(PipelineTask):
@@ -83,6 +81,13 @@ class ShellTask(PipelineTask):
         Run the system command in the shell
         Don't run in subprocess if command = False
         '''
+        # Set input files and dirs
+        if self.input_suffix != None: # no input suffix = no input files
+            if self.input_task != None:
+                self.set_input_from_task(input_task, input_suffix)
+            else:
+                self.set_inputs(self.input_dir, self.input_suffix)
+        # start building the command to run
         command = self.build_command()
         if command != False:
             print_divider("Now running task: {}".format(self.name))

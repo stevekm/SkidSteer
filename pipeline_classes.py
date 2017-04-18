@@ -111,6 +111,9 @@ class bamToBed(ShellTask):
     def __init__(self, *args, **kwargs):
         ShellTask.__init__(self, 'bamToBed', input_suffix = ".bam", output_suffix = ".bed", *args, **kwargs)
         self.sys_command ='bamToBed'
+        self.pre_command = 'export LC_COLLATE=C'
+        import os
+        self.tmp_file = os.path.join(self.output_dir, "tmp")
     def build_command(self):
         '''
         Method for building the bamToBed command
@@ -121,8 +124,95 @@ class bamToBed(ShellTask):
         # list to hold command for each input file
         command_list = []
         for input_bam in self.input_files:
-            output_bam = transform_file(input_file = input_bam, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
-            file_command = '{} -i {} > {}'.format(command, input_bam, output_bam)
+            output_bed = transform_file(input_file = input_bam, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
+            file_command = '{} -i {} > {}'.format(command, input_bam, output_bed)
+            file_command = '{}\nsort -k1,1 -k2,2n {} > {} && /bin/mv {} {}'.format(file_command, output_bed, self.tmp_file, self.tmp_file, output_bed)
+            command_list.append(file_command)
+        # make a single command string for all the input files
+        command = '\n'.join(command_list)
+        # add the pre_processing step to the command
+        command = '{}\n{}'.format(self.pre_command, command)
+        return(command)
+
+class bedToBigBed(ShellTask):
+    '''
+    Convert a BED file to BigBED format
+    '''
+    def __init__(self, *args, **kwargs):
+        ShellTask.__init__(self, 'bedToBigBed', input_suffix = ".bed", output_suffix = ".bigbed", *args, **kwargs)
+        self.sys_command ='bedToBigBed'
+        self.chrom_sizes = "data/hg19.chrom.sizes_full.txt"
+    def build_command(self):
+        '''
+        Method for building the bedToBigBed command
+        ex: bedToBigBed test.bed "$chrom_sizes" test.bigBed
+        '''
+        # set the base command and params
+        command = '{}'.format(self.sys_command)
+        # list to hold command for each input file
+        command_list = []
+        for input_bed in self.input_files:
+            output_bed = transform_file(input_file = input_bed, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
+            file_command = '{} "{}" "{}" "{}"'.format(command, input_bed, self.chrom_sizes, output_bed)
+            command_list.append(file_command)
+        # make a single command string for all the input files
+        command = '\n'.join(command_list)
+        return(command)
+
+
+class bamToBedgraph(ShellTask):
+    '''
+    Convert a BAM file to Bedgraph format
+    '''
+    def __init__(self, *args, **kwargs):
+        ShellTask.__init__(self, 'bamToBedgraph', input_suffix = ".bam", output_suffix = ".bedgraph", *args, **kwargs)
+        self.sys_command ='bedtools genomecov'
+        self.chrom_sizes = "data/hg19.chrom.sizes_full.txt"
+        self.pre_command = 'export LC_COLLATE=C'
+        import os
+        self.tmp_file = os.path.join(self.output_dir, "tmp")
+    def build_command(self):
+        '''
+        Method for building the bam to bedgraph command
+        ex: bedtools genomecov -ibam test.bam -g "$chrom_sizes" -bg > test.bedgraph
+        '''
+        # set the base command and params
+        command = '{}'.format(self.sys_command)
+        # list to hold command for each input file
+        command_list = []
+        for input_bam in self.input_files:
+            output_bedgraph = transform_file(input_file = input_bam, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
+            file_command = '{} -ibam "{}" -g "{}" -bg > "{}"'.format(command, input_bam, self.chrom_sizes, output_bedgraph)
+            file_command = '{}\nsort -k1,1 -k2,2n {} > {} && /bin/mv {} {}'.format(file_command, output_bedgraph, self.tmp_file, self.tmp_file, output_bedgraph)
+            command_list.append(file_command)
+        # make a single command string for all the input files
+        command = '\n'.join(command_list)
+        # add the pre_processing step to the command
+        command = '{}\n{}'.format(self.pre_command, command)
+        return(command)
+
+
+class bedgraphToBigWig(ShellTask):
+    '''
+    Convert a Bedgraph file to BigWig format
+    '''
+    def __init__(self, *args, **kwargs):
+        ShellTask.__init__(self, 'bedgraphToBigWig', input_suffix = ".bedgraph", output_suffix = ".bw", *args, **kwargs)
+        self.sys_command ='bedGraphToBigWig'
+        self.chrom_sizes = "data/hg19.chrom.sizes_full.txt"
+
+    def build_command(self):
+        '''
+        Method for building the bam to bedgraph command
+        ex: bedGraphToBigWig test.bedgraph "$chrom_sizes" test.bigwig
+        '''
+        # set the base command and params
+        command = '{}'.format(self.sys_command)
+        # list to hold command for each input file
+        command_list = []
+        for input_bg in self.input_files:
+            output_bw = transform_file(input_file = input_bg, input_suffix = self.input_suffix, output_dir = self.output_dir, output_suffix = self.output_suffix)
+            file_command = '{} "{}" "{}" "{}"'.format(command, input_bg, self.chrom_sizes, output_bw)
             command_list.append(file_command)
         # make a single command string for all the input files
         command = '\n'.join(command_list)

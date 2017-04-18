@@ -92,3 +92,4 @@ ENV/
 *.html
 *.bam
 *.bai
+.project_log.tsv

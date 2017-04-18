@@ -48,7 +48,7 @@ def mkdirs(path, return_path=False):
 def find_sample_files(dir, sampleID, file_suffix):
     import os
     file_list = []
-    for file in os.listdir("input"):
+    for file in os.listdir(dir): # for file in os.listdir("input"):
         if file.endswith(file_suffix):
             if file.startswith(sampleID):
                 file_list.append(os.path.join(dir, file))
